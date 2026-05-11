@@ -1,0 +1,289 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  users(role: String, isActive: Boolean, search: String, limit: Int, offset: Int): [User!]!
+  user(id: ID!): User!
+
+  warehouses(isActive: Boolean, code: String, search: String, limit: Int, offset: Int): [Warehouse!]!
+  warehouse(id: ID!): Warehouse!
+  warehouseStock(warehouseID: ID!): [StockItem!]!
+  warehouseMovements(warehouseID: ID!, limit: Int, offset: Int): [Movement!]!
+
+  categories(isActive: Boolean, search: String, limit: Int, offset: Int): [Category!]!
+  category(id: ID!): Category!
+
+  products(categoryID: ID, isActive: Boolean, sku: String, name: String, search: String, limit: Int, offset: Int): [Product!]!
+  productsByCategory(categoryID: ID!, limit: Int, offset: Int): [Product!]!
+  product(id: ID!): Product!
+  productStock(productID: ID!): [StockItem!]!
+  productTotalStock(productID: ID!): TotalStock!
+  lowStockProducts: [StockStatus!]!
+  productMovements(productID: ID!, limit: Int, offset: Int): [Movement!]!
+
+  supplies(warehouseID: ID, status: String, limit: Int, offset: Int): [Supply!]!
+  supply(id: ID!): Supply!
+
+  outboundRequests(warehouseID: ID, status: String, limit: Int, offset: Int): [OutboundRequest!]!
+  outboundRequest(id: ID!): OutboundRequest!
+
+  transfers(warehouseID: ID, sourceWarehouseID: ID, targetWarehouseID: ID, status: String, limit: Int, offset: Int): [Transfer!]!
+  transfer(id: ID!): Transfer!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+
+  createWarehouse(input: WarehouseInput!): Warehouse!
+  updateWarehouse(id: ID!, input: WarehouseInput!): Warehouse!
+  deleteWarehouse(id: ID!): Boolean!
+  activateWarehouse(id: ID!): Boolean!
+  deactivateWarehouse(id: ID!): Boolean!
+
+  createCategory(input: CategoryInput!): Category!
+  updateCategory(id: ID!, input: CategoryInput!): Category!
+  deleteCategory(id: ID!): Boolean!
+
+  createProduct(input: ProductInput!): Product!
+  updateProduct(id: ID!, input: ProductInput!): Product!
+  deleteProduct(id: ID!): Boolean!
+  activateProduct(id: ID!): Boolean!
+  deactivateProduct(id: ID!): Boolean!
+
+  createSupply(input: CreateSupplyInput!): Supply!
+  addSupplyItem(supplyID: ID!, input: SupplyItemInput!): SupplyItem!
+  updateSupplyItem(supplyID: ID!, itemID: ID!, input: SupplyItemInput!): SupplyItem!
+  deleteSupplyItem(supplyID: ID!, itemID: ID!): Boolean!
+  confirmSupply(id: ID!, userID: ID!): Supply!
+  cancelSupply(id: ID!, userID: ID!): Supply!
+  deleteSupply(id: ID!): Boolean!
+
+  createOutboundRequest(input: CreateOutboundRequestInput!): OutboundRequest!
+  addOutboundRequestItem(outboundRequestID: ID!, input: OutboundRequestItemInput!): OutboundRequestItem!
+  updateOutboundRequestItem(outboundRequestID: ID!, itemID: ID!, input: OutboundRequestItemInput!): OutboundRequestItem!
+  deleteOutboundRequestItem(outboundRequestID: ID!, itemID: ID!): Boolean!
+  approveOutboundRequest(id: ID!, userID: ID!): OutboundRequest!
+  rejectOutboundRequest(id: ID!, userID: ID!): OutboundRequest!
+  cancelOutboundRequest(id: ID!, userID: ID!): OutboundRequest!
+  executeOutboundRequest(id: ID!, userID: ID!): OutboundRequest!
+  deleteOutboundRequest(id: ID!): Boolean!
+
+  createTransfer(input: CreateTransferInput!): Transfer!
+  addTransferItem(transferID: ID!, input: TransferItemInput!): TransferItem!
+  updateTransferItem(transferID: ID!, itemID: ID!, input: TransferItemInput!): TransferItem!
+  deleteTransferItem(transferID: ID!, itemID: ID!): Boolean!
+  confirmTransfer(id: ID!, userID: ID!): Transfer!
+  cancelTransfer(id: ID!, userID: ID!): Transfer!
+  deleteTransfer(id: ID!): Boolean!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  role: String!
+}
+
+input UpdateUserInput {
+  name: String!
+  email: String!
+  role: String!
+  isActive: Boolean!
+}
+
+input WarehouseInput {
+  name: String!
+  code: String!
+  location: String
+  isActive: Boolean
+}
+
+input CategoryInput {
+  name: String!
+  description: String
+  isActive: Boolean
+}
+
+input ProductInput {
+  name: String!
+  sku: String!
+  categoryID: ID!
+  unitOfMeasure: String!
+  minStockThreshold: Int!
+  isActive: Boolean
+}
+
+input CreateSupplyInput {
+  warehouseID: ID!
+  createdByUserID: ID!
+}
+
+input SupplyItemInput {
+  productID: ID!
+  quantity: Int!
+  unitPriceCents: Int!
+}
+
+input CreateOutboundRequestInput {
+  warehouseID: ID!
+  createdByUserID: ID!
+}
+
+input OutboundRequestItemInput {
+  productID: ID!
+  quantity: Int!
+}
+
+input CreateTransferInput {
+  sourceWarehouseID: ID!
+  targetWarehouseID: ID!
+  createdByUserID: ID!
+}
+
+input TransferItemInput {
+  productID: ID!
+  quantity: Int!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  role: String!
+  isActive: Boolean!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Warehouse {
+  id: ID!
+  name: String!
+  code: String!
+  location: String!
+  isActive: Boolean!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  description: String!
+  isActive: Boolean!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Product {
+  id: ID!
+  name: String!
+  sku: String!
+  categoryID: ID!
+  unitOfMeasure: String!
+  minStockThreshold: Int!
+  isActive: Boolean!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type StockItem {
+  id: ID!
+  warehouseID: ID!
+  productID: ID!
+  quantity: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type StockStatus {
+  stockItem: StockItem!
+  product: Product!
+  state: String!
+}
+
+type TotalStock {
+  productID: ID!
+  quantity: Int!
+}
+
+type Supply {
+  id: ID!
+  warehouseID: ID!
+  status: String!
+  createdByUserID: ID!
+  confirmedByUserID: ID
+  cancelledByUserID: ID
+  items: [SupplyItem!]!
+  createdAt: String!
+  updatedAt: String!
+  confirmedAt: String
+  cancelledAt: String
+}
+
+type SupplyItem {
+  id: ID!
+  supplyID: ID!
+  productID: ID!
+  quantity: Int!
+  unitPriceCents: Int!
+}
+
+type OutboundRequest {
+  id: ID!
+  warehouseID: ID!
+  status: String!
+  createdByUserID: ID!
+  approvedByUserID: ID
+  executedByUserID: ID
+  cancelledByUserID: ID
+  items: [OutboundRequestItem!]!
+  createdAt: String!
+  updatedAt: String!
+  approvedAt: String
+  executedAt: String
+  cancelledAt: String
+}
+
+type OutboundRequestItem {
+  id: ID!
+  outboundRequestID: ID!
+  productID: ID!
+  quantity: Int!
+}
+
+type Transfer {
+  id: ID!
+  sourceWarehouseID: ID!
+  targetWarehouseID: ID!
+  status: String!
+  createdByUserID: ID!
+  confirmedByUserID: ID
+  cancelledByUserID: ID
+  items: [TransferItem!]!
+  createdAt: String!
+  updatedAt: String!
+  confirmedAt: String
+  cancelledAt: String
+}
+
+type TransferItem {
+  id: ID!
+  transferID: ID!
+  productID: ID!
+  quantity: Int!
+}
+
+type Movement {
+  kind: String!
+  operationID: ID!
+  operationItemID: ID!
+  productID: ID!
+  warehouseID: ID!
+  relatedWarehouseID: ID
+  quantity: Int!
+  status: String!
+  occurredAt: String!
+}
