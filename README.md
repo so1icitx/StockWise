@@ -80,12 +80,23 @@ tests/        unit and integration tests
 
 ## Getting started
 
+The quickest way to run the project locally is:
+
+```bash
+chmod +x scripts/dev.sh
+./scripts/dev.sh
+```
+
+The script starts a PostgreSQL container if needed, runs migrations, applies
+seed data, and starts the API. It uses `stockwise` as the PostgreSQL user,
+password, and database name.
+
 Start PostgreSQL:
 
 ```bash
 docker run --name stockwise-postgres \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_USER=stockwise \
+  -e POSTGRES_PASSWORD=stockwise \
   -e POSTGRES_DB=stockwise \
   -p 5432:5432 \
   -d postgres:16
@@ -94,7 +105,7 @@ docker run --name stockwise-postgres \
 Set the connection string:
 
 ```bash
-export DATABASE_URL='postgres://postgres:postgres@127.0.0.1:5432/stockwise?sslmode=disable'
+export DATABASE_URL='postgres://stockwise:stockwise@127.0.0.1:5432/stockwise?sslmode=disable'
 ```
 
 Run migrations, seed data, and start the API:
@@ -233,12 +244,6 @@ go test ./tests/integration/... -count=1 -v
 
 Integration tests use Testcontainers PostgreSQL, real Goose migrations, a real
 Gin server, REST calls, GraphQL calls, and a WebSocket client.
-
-Full local verification:
-
-```bash
-./scripts/test.sh
-```
 
 ## Useful commands
 
