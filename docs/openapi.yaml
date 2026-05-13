@@ -1,0 +1,421 @@
+openapi: 3.0.3
+info:
+  title: StockWise Inventory & Warehouse API
+  version: 0.6.0
+  description: REST API for warehouses, products, stock, supplies, outbound requests, transfers, and movements.
+servers:
+  - url: http://localhost:8080/api/v1
+security:
+  - UserHeader: []
+paths:
+  /users:
+    get:
+      summary: List users
+      responses:
+        "200": { description: Users returned }
+    post:
+      summary: Create user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateUserRequest" }
+      responses:
+        "201": { description: User created }
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: User returned }
+    put:
+      summary: Update user
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: User updated }
+    delete:
+      summary: Delete user
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: User deleted }
+  /warehouses:
+    get:
+      summary: List warehouses
+      responses:
+        "200": { description: Warehouses returned }
+    post:
+      summary: Create warehouse
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WarehouseRequest" }
+      responses:
+        "201": { description: Warehouse created }
+  /warehouses/{id}:
+    get:
+      summary: Get warehouse by ID
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Warehouse returned }
+    put:
+      summary: Update warehouse
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Warehouse updated }
+    delete:
+      summary: Delete warehouse
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Warehouse deleted or deactivated when history exists }
+  /warehouses/{id}/activate:
+    patch:
+      summary: Activate warehouse
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Warehouse activated }
+  /warehouses/{id}/deactivate:
+    patch:
+      summary: Deactivate warehouse
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Warehouse deactivated }
+  /warehouses/{id}/stock:
+    get:
+      summary: Get warehouse stock
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Stock returned }
+  /warehouses/{id}/movements:
+    get:
+      summary: Get warehouse movement history
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Movements returned }
+  /categories:
+    get:
+      summary: List categories
+      responses:
+        "200": { description: Categories returned }
+    post:
+      summary: Create category
+      security: []
+      responses:
+        "201": { description: Category created }
+  /categories/{id}:
+    get:
+      summary: Get category by ID
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Category returned }
+    put:
+      summary: Update category
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Category updated }
+    delete:
+      summary: Delete category
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Category deleted or deactivated }
+  /products:
+    get:
+      summary: List products
+      parameters:
+        - { name: category_id, in: query, schema: { type: integer } }
+        - { name: is_active, in: query, schema: { type: boolean } }
+        - { name: sku, in: query, schema: { type: string } }
+        - { name: name, in: query, schema: { type: string } }
+      responses:
+        "200": { description: Products returned }
+    post:
+      summary: Create product
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductRequest" }
+      responses:
+        "201": { description: Product created }
+  /products/low-stock:
+    get:
+      summary: Get low-stock and out-of-stock products
+      responses:
+        "200": { description: Low-stock products returned }
+  /products/{id}:
+    get:
+      summary: Get product by ID
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Product returned }
+    put:
+      summary: Update product
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Product updated }
+    delete:
+      summary: Delete or deactivate product
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Product deleted or deactivated }
+  /products/{id}/activate:
+    patch:
+      summary: Activate product
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Product activated }
+  /products/{id}/deactivate:
+    patch:
+      summary: Deactivate product
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Product deactivated }
+  /products/{id}/total-stock:
+    get:
+      summary: Get total stock for product
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Total stock returned }
+  /products/{id}/stock:
+    get:
+      summary: Get product stock across warehouses
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Product stock returned }
+  /products/{id}/movements:
+    get:
+      summary: Get product movement history
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Movements returned }
+  /supplies:
+    get:
+      summary: List supplies
+      responses:
+        "200": { description: Supplies returned }
+    post:
+      summary: Create supply
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupplyCreateRequest" }
+      responses:
+        "201": { description: Supply created }
+  /supplies/{id}:
+    get:
+      summary: Get supply by ID
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Supply returned }
+    delete:
+      summary: Delete draft supply
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Supply deleted }
+  /supplies/{id}/items:
+    post:
+      summary: Add supply item
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "201": { description: Supply item added }
+  /supplies/{id}/items/{itemID}:
+    put:
+      summary: Update supply item
+      parameters:
+        - { $ref: "#/components/parameters/ID" }
+        - { $ref: "#/components/parameters/ItemID" }
+      responses:
+        "200": { description: Supply item updated }
+    delete:
+      summary: Delete supply item
+      parameters:
+        - { $ref: "#/components/parameters/ID" }
+        - { $ref: "#/components/parameters/ItemID" }
+      responses:
+        "204": { description: Supply item deleted }
+  /supplies/{id}/confirm:
+    post:
+      summary: Confirm supply and increase stock
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Supply confirmed }
+  /supplies/{id}/cancel:
+    post:
+      summary: Cancel supply
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Supply cancelled }
+  /outbound-requests:
+    get:
+      summary: List outbound requests
+      responses:
+        "200": { description: Outbound requests returned }
+    post:
+      summary: Create outbound request
+      responses:
+        "201": { description: Outbound request created }
+  /outbound-requests/{id}:
+    get:
+      summary: Get outbound request by ID
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Outbound request returned }
+    delete:
+      summary: Delete draft outbound request
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Outbound request deleted }
+  /outbound-requests/{id}/items:
+    post:
+      summary: Add outbound request item
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "201": { description: Item added }
+  /outbound-requests/{id}/items/{itemID}:
+    put:
+      summary: Update outbound request item
+      parameters:
+        - { $ref: "#/components/parameters/ID" }
+        - { $ref: "#/components/parameters/ItemID" }
+      responses:
+        "200": { description: Item updated }
+    delete:
+      summary: Delete outbound request item
+      parameters:
+        - { $ref: "#/components/parameters/ID" }
+        - { $ref: "#/components/parameters/ItemID" }
+      responses:
+        "204": { description: Item deleted }
+  /outbound-requests/{id}/approve:
+    post:
+      summary: Approve outbound request
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Request approved }
+  /outbound-requests/{id}/execute:
+    post:
+      summary: Execute outbound request and decrease stock
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Request executed }
+  /outbound-requests/{id}/reject:
+    post:
+      summary: Reject outbound request
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Request rejected }
+  /outbound-requests/{id}/cancel:
+    post:
+      summary: Cancel outbound request
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Request cancelled }
+  /transfers:
+    get:
+      summary: List transfers
+      responses:
+        "200": { description: Transfers returned }
+    post:
+      summary: Create transfer
+      responses:
+        "201": { description: Transfer created }
+  /transfers/{id}:
+    get:
+      summary: Get transfer by ID
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Transfer returned }
+    delete:
+      summary: Delete draft transfer
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "204": { description: Transfer deleted }
+  /transfers/{id}/items:
+    post:
+      summary: Add transfer item
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "201": { description: Item added }
+  /transfers/{id}/items/{itemID}:
+    put:
+      summary: Update transfer item
+      parameters:
+        - { $ref: "#/components/parameters/ID" }
+        - { $ref: "#/components/parameters/ItemID" }
+      responses:
+        "200": { description: Item updated }
+    delete:
+      summary: Delete transfer item
+      parameters:
+        - { $ref: "#/components/parameters/ID" }
+        - { $ref: "#/components/parameters/ItemID" }
+      responses:
+        "204": { description: Item deleted }
+  /transfers/{id}/confirm:
+    post:
+      summary: Confirm transfer and move stock
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Transfer confirmed }
+  /transfers/{id}/cancel:
+    post:
+      summary: Cancel transfer
+      parameters: [ { $ref: "#/components/parameters/ID" } ]
+      responses:
+        "200": { description: Transfer cancelled }
+components:
+  securitySchemes:
+    UserHeader:
+      type: apiKey
+      in: header
+      name: X-User-ID
+  parameters:
+    ID:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int64, minimum: 1 }
+    ItemID:
+      name: itemID
+      in: path
+      required: true
+      schema: { type: integer, format: int64, minimum: 1 }
+  schemas:
+    CreateUserRequest:
+      type: object
+      required: [name, email, role]
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+        role: { type: string, enum: [Admin, Manager, Operator] }
+    WarehouseRequest:
+      type: object
+      required: [name, code]
+      properties:
+        name: { type: string }
+        code: { type: string }
+        location: { type: string }
+        is_active: { type: boolean }
+    ProductRequest:
+      type: object
+      required: [name, sku, category_id, unit_of_measure]
+      properties:
+        name: { type: string }
+        sku: { type: string }
+        category_id: { type: integer, format: int64 }
+        unit_of_measure: { type: string }
+        min_stock_threshold: { type: integer, format: int64, minimum: 0 }
+        is_active: { type: boolean }
+    SupplyCreateRequest:
+      type: object
+      required: [warehouse_id]
+      properties:
+        warehouse_id: { type: integer, format: int64 }
+    ErrorResponse:
+      type: object
+      properties:
+        error: { type: string }
